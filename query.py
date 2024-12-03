@@ -29,10 +29,11 @@
 #------------------------------------------------#------------------------------------------------
 
 from config import index, model, tokenizer
-from utils import mean_pooling,normalize_embeddings
+from utils import mean_pooling,normalize_embeddings,reduce_dimension
 import torch
 
-def upsert_sentence(sentence, unique_id):
+
+def upsert_sentence(sentence, unique_id, target_dim=384):
     """
     Generate an embedding for a sentence and upsert it into the Pinecone index.
     """
@@ -46,6 +47,10 @@ def upsert_sentence(sentence, unique_id):
     print('Generate embeddings using the model......',model_output)
     # Apply mean pooling to get a single vector representation
     embedding = mean_pooling(model_output, inputs["attention_mask"])
+
+    # Reduce dimensions if target_dim is less than the original embedding size
+    if target_dim and target_dim < embedding.shape[0]:
+        embedding = reduce_dimension(embedding, target_dim=target_dim)
 
     # Normalize the embedding
     embedding = normalize_embeddings(embedding)
@@ -67,7 +72,7 @@ def upsert_sentence(sentence, unique_id):
     print(f"Upserted sentence: {sentence}")
 
 
-def query_sentence(sentence, top_k=3):
+def query_sentence(sentence, top_k=1,target_dim=384):
     """
     Query the Pinecone index to find similar sentences.
     """
@@ -81,6 +86,10 @@ def query_sentence(sentence, top_k=3):
     # Apply mean pooling to get a single vector representation
     embedding = mean_pooling(model_output, inputs["attention_mask"])
 
+    # Reduce dimensions if target_dim is less than the original embedding size
+    if target_dim and target_dim < embedding.shape[0]:
+        embedding = reduce_dimension(embedding, target_dim=target_dim)
+
     # Normalize the embedding
     embedding = normalize_embeddings(embedding)
 
@@ -88,11 +97,12 @@ def query_sentence(sentence, top_k=3):
     embedding = embedding.squeeze(0).numpy().tolist()
 
     # Query the Pinecone index
-    results = index.query(vector=embedding, top_k=top_k, include_metadata=True, metric="cosine")
+    results = index.query(vector=embedding, top_k=top_k, include_metadata=True, metric="cosine",include_values=True) #include_value true to get the embeddings base on queries
 
     # Print results
     for match in results["matches"]:
-        print(f"Matched sentence: {match['metadata']['sentence']} (score: {match['score']})")
+        print(f"Matched sentence: {match['metadata']['sentence']} (score: {match['score']}) and result is {results}")
+        print(f"Matched embedding: {match.get('values', [])}")
 
 
 #------------------------------------------------#------------------------------------------------

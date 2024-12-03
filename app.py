@@ -17,14 +17,14 @@
 from query import upsert_sentence, query_sentence
 
 # Define a sentence to store
-sentence_to_store = "javascript and python are best programming language."
-unique_id = "sentence-2"
+sentence_to_store = "this is my testing text"
+unique_id = "sentence-4"
 
 # Upsert the sentence
-# upsert_sentence(sentence_to_store, unique_id)
+# upsert_sentence(sentence_to_store, unique_id,target_dim=128)
 
 # Query the sentence
-query_sentence("world")
+query_sentence("world",target_dim=128)
 
 
 
