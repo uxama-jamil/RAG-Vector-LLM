@@ -1,0 +1,6 @@
+sentence-transformers==2.2.2
+pinecone-client==2.2.2
+transformers==4.33.2
+numpy==1.25.2
+python-dotenv==1.0.0
+torch==2.0.1  # Required for manual pooling
