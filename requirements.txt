@@ -1,7 +1,11 @@
-sentence-transformers==2.2.2
-pinecone-client==2.2.2
-transformers==4.33.2
-numpy==1.25.2
-python-dotenv==1.0.0
-pinecone==5.4.1
-torch==2.0.1  # Required for manual pooling
+langchain
+chromadb
+transformers
+sentence-transformers
+torch
+pymupdf
+scikit-learn
+python-dotenv
+tqdm
+llama-cpp-python
+langchain-community
